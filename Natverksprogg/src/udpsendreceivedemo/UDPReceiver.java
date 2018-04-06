@@ -19,7 +19,7 @@ public class UDPReceiver {
         DatagramSocket udpSocket;
         udpSocket = new DatagramSocket(35000);
         
-        byte[] data = new byte[256];
+        byte[] data = new byte[512];
         
         while(true){
             DatagramPacket packet;

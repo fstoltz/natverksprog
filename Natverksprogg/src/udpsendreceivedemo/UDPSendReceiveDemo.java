@@ -12,6 +12,7 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -34,10 +35,13 @@ public class UDPSendReceiveDemo {
         BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
         
         while(true){
-            msg = in.readLine();
+            String city = JOptionPane.showInputDialog("Enter name of city: ");
+            msg = JOptionPane.showInputDialog("Enter temperature value: ");
             if(msg.equals("EXIT")){ break; }
             
-            byte[] data = msg.getBytes();
+            String completeMsg = city + "-" + msg;
+            
+            byte[] data = (completeMsg.getBytes());
             DatagramPacket packet;
             packet = new DatagramPacket(data, data.length, toAdr, 35000);
             udpSocket.send(packet);
