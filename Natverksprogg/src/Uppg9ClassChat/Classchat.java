@@ -5,6 +5,8 @@
  */
 package Uppg9ClassChat;
 
+import java.io.IOException;
+
 /**
  *
  * @author fstoltz
@@ -12,7 +14,7 @@ package Uppg9ClassChat;
 public class Classchat {
     
     
-    public static void main(String[] args){
+    public static void main(String[] args) throws IOException{
         ChatGUI gui = new ChatGUI();
     }
     

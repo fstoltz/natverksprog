@@ -17,6 +17,7 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
 import java.net.SocketException;
+import java.net.*;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -26,7 +27,7 @@ import javax.swing.*;
  *
  * @author fstoltz
  */
-public class ChatGUI implements ActionListener{
+public class ChatGUI extends Thread implements ActionListener{
     /*This class will build a chat GUI*/
     JFrame frame = new JFrame(); //FRAME
     /*PANELS*/
@@ -39,7 +40,20 @@ public class ChatGUI implements ActionListener{
     JTextArea chatArea = new JTextArea();
     JTextField inputField = new JTextField("asd", 20);
     
-    ChatGUI(){
+    /*hold text history*/
+    String textHistory;
+    
+    /*THREADS??? Chat GUI have a receive socket thread??*/
+    Thread receiveThread = new Thread(this);
+    
+
+//  int randomNum = ThreadLocalRandom.current().nextInt(30000, 40000);
+    
+
+    ChatGUI() throws UnknownHostException, IOException {
+        
+        this.receiveThread.setName("REC-Thread");
+        
         mainPanel.setLayout(new BorderLayout());
         buttonPanel.setLayout(new FlowLayout());
         chatArea.setFont(new Font("Fira Code", Font.PLAIN, 14));
@@ -71,14 +85,42 @@ public class ChatGUI implements ActionListener{
         frame.setSize(600, 400); //Set the size of the frame(canvas)
         frame.setVisible(true);
         frame.setDefaultCloseOperation(3); //3 means exit
+        
+        
     }
     
     
+    @Override
+    public void run(){
+        
+        try {
+            InetAddress grp = InetAddress.getByName("234.235.236.237");
+            MulticastSocket recSocket = new MulticastSocket(12540);
+            recSocket.joinGroup(grp);
+            
+            byte[] buffer = new byte[256];
+            DatagramPacket myPkt = new DatagramPacket(buffer, buffer.length); //Create the packet
+            System.out.println("I'm heeeere");
+            
+            while(true){ //THE THREADS LOCKS AT THIS WHILE LOOP, DOES IT FOREVER, .RECEIVE() is blocking, waits for a packet to arrive, then prints it, then starts waiting again
+                recSocket.receive(myPkt); //Receive the packet
+                String received = new String(myPkt.getData(), 0, myPkt.getLength());
+                this.textHistory += received;
+                chatArea.setText(this.textHistory);
+            }
+            //System.out.println("RECIVED: " + received);
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+//        this.textHistory += msg + "\n";
+//        chatArea.setText(this.textHistory);
+    }
     
     
     public void startListening(){
         //create a Multicast socket on a separate thread that sends the payload
         //of incoming packets to chatArea
+        this.start();
     }
     
     
@@ -88,17 +130,16 @@ public class ChatGUI implements ActionListener{
     
     
     public void sendMessage(String msg) throws SocketException, IOException{
-        
         InetAddress group = InetAddress.getByName("234.235.236.237");
-        int randomNum = ThreadLocalRandom.current().nextInt(30000, 40000);
+        MulticastSocket sendSocket = new MulticastSocket(12540);
         
-        MulticastSocket s = new MulticastSocket(12540); //Create a multicast-UDP-Socket
-        s.joinGroup(group); //Join the specific IP address group
+        sendSocket.joinGroup(group);
         
         DatagramPacket myPkt = new DatagramPacket(msg.getBytes(), msg.length(), group, 12540); //Create the packet
-        s.send(myPkt); //Send the packet
         
-        
+        sendSocket.send(myPkt); //Send the packet
+        //this.textHistory += msg + "\n";
+        //chatArea.setText(this.textHistory);
     }
     
 
