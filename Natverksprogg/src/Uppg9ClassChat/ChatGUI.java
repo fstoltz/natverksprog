@@ -73,6 +73,9 @@ public class ChatGUI extends Thread implements ActionListener{
     boolean connected = false;
 //  int randomNum = ThreadLocalRandom.current().nextInt(30000, 40000);
     
+    
+    /*LISTENER SOCKET SETUP PART*/
+    MulticastHandler handle = new MulticastHandler(chatArea);
 
     ChatGUI() throws UnknownHostException, IOException {
         
@@ -97,18 +100,25 @@ public class ChatGUI extends Thread implements ActionListener{
         buttonPanel.add(conButton);
         buttonPanel.add(disconButton);
         
+        this.chatArea.setEditable(false);
         
-        
+        JScrollPane scroll = new JScrollPane(this.chatArea);
+        scroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+        this.chatArea.setAutoscrolls(true);
+        this.chatArea.setLineWrap(true);
         /*Add panel to the frame*/
         frame.add(mainPanel);
         frame.add(buttonPanel, NORTH);
         
-        mainPanel.add(chatArea, CENTER);
+        mainPanel.add(scroll, CENTER);
         
         mainPanel.add(inputPanel, SOUTH);
         
         inputPanel.add(inputLabel);
         inputPanel.add(inputField);
+        
+        
+        
         
         
         //mainPanel.add(inputField, SOUTH);
@@ -135,8 +145,9 @@ public class ChatGUI extends Thread implements ActionListener{
             DatagramPacket myPkt = new DatagramPacket(buffer, buffer.length); //Create the packet
             System.out.println("I'm heeeere");
             
-            this.textHistory += ">>> Connected!\n";
-            this.chatArea.setText(this.textHistory);
+            this.chatArea.append(">>> Connected!\n");
+            //this.textHistory += ">>> Connected!\n";
+            //this.chatArea.setText(this.textHistory);
             while(true){ //THE THREADS LOCKS AT THIS WHILE LOOP, DOES IT FOREVER, .RECEIVE() is blocking, waits for a packet to arrive, then prints it, then starts waiting again
                 //and the main thread is handling the ActionEvents/Listeners
                 this.connected = true;
@@ -144,8 +155,10 @@ public class ChatGUI extends Thread implements ActionListener{
                 this.connected = false;
                 String received = new String(myPkt.getData(), 0, myPkt.getLength());
                 LocalTime time = LocalTime.now();
-                this.textHistory += time.getHour() + ":" + time.getMinute() + " " + received + "\t\t\t(from: " + myPkt.getSocketAddress() + ")\n";
-                chatArea.setText(this.textHistory);
+                //this.textHistory += time.getHour() + ":" + time.getMinute() + " " + received + "\t\t\t(from: " + myPkt.getSocketAddress() + ")\n";
+                this.chatArea.append(time.getHour() + ":" + time.getMinute() + " " + received + "\t\t\t(from: " + myPkt.getSocketAddress() + ")\n");
+                
+                //chatArea.setText(this.textHistory);
             }
             
             //System.out.println("RECIVED: " + received);
@@ -161,11 +174,18 @@ public class ChatGUI extends Thread implements ActionListener{
         //create a Multicast socket on a separate thread that sends the payload
         //of incoming packets to chatArea
         if(this.connected == false){
-            this.start();
-        } else {
-            this.textHistory += ">>> You are already connected!\n";
-            this.chatArea.setText(this.textHistory);
+            Thread recThread = new Thread(this.handle);
+            this.connected = true;
+            recThread.start();
         }
+        
+//        if(this.connected == false){
+//            this.start();
+//        } else {
+//            this.chatArea.append(">>> You are already connected!\n");
+//            //this.textHistory += ">>> You are already connected!\n";
+//            //this.chatArea.setText(this.textHistory);
+//        }
         
     }
     
@@ -179,8 +199,9 @@ public class ChatGUI extends Thread implements ActionListener{
         if(this.usernameSet == false){ //if it's first time user enters something in box, set the username
             this.inputLabel.setText(msg + ": ");
             this.usernameSet = true;
-            this.textHistory += ">>> Successfully set username to: " + msg + "\n"; 
-            this.chatArea.setText(this.textHistory);
+            this.chatArea.append(">>> Successfully set username to: " + msg + "\n");
+//            this.textHistory += ">>> Successfully set username to: " + msg + "\n"; 
+//            this.chatArea.setText(this.textHistory);
             return;//leave this method so that it doesn't send the username as a packet to listeners
         } else { // if username has been set, append it to the message that will be sent
                       /*the username*/    /*the message*/
@@ -188,7 +209,7 @@ public class ChatGUI extends Thread implements ActionListener{
         }
         
         InetAddress group = InetAddress.getByName("234.235.236.237");
-        MulticastSocket sendSocket = new MulticastSocket(12540);
+        MulticastSocket sendSocket = new MulticastSocket(ThreadLocalRandom.current().nextInt(30000, 40000));
         
         sendSocket.joinGroup(group);
         
@@ -197,8 +218,9 @@ public class ChatGUI extends Thread implements ActionListener{
         if(this.connected == true){//Send the packet if user is also listening on socket
             sendSocket.send(myPkt); 
         } else { //Print to the user that they need to 'Connect' before sending a message
-            this.textHistory += ">>> Please 'Connect' before trying to send a message...\n";
-            this.chatArea.setText(this.textHistory);
+            this.chatArea.append(">>> Please 'Connect' before trying to send a message...\n");
+//            this.textHistory += ">>> Please 'Connect' before trying to send a message...\n";
+//            this.chatArea.setText(this.textHistory);
             return;
         }
         
