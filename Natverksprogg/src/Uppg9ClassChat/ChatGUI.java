@@ -46,7 +46,7 @@ public class ChatGUI extends Thread implements ActionListener{
     JTextArea chatArea = new JTextArea();
     JTextField inputField = new JTextField("", 30);
     
-    /*username is set or not holder*/
+    /*username is set or not holder*/   
     boolean usernameSet = false;
     
     /*Connected or not tracker*/
@@ -103,9 +103,11 @@ public class ChatGUI extends Thread implements ActionListener{
     public void startListening(){
         //create a Multicast socket on a separate thread that sends the payload
         //of incoming packets to chatArea
-        if(this.connected == false){
+        if(this.handle.connected == false){
+            this.chatArea.append(">>> Connected!\n");
+            //System.out.println(this.connected);
+            this.handle.connected = true;
             Thread recThread = new Thread(this.handle); // this handle is a MulticastHandler object that implements Runnable, does not 'create' a new Thread. It only instansiates a object of Thread type.
-            this.connected = true;
             //initiates another point of execution, the 'Run' method at MulticastHandler
             //'main' thread continues. the recThread immediately locks at the socket.receive()
             recThread.start();//this is the line where the actual thread is started.
@@ -115,7 +117,13 @@ public class ChatGUI extends Thread implements ActionListener{
     /**
      * NOT IMPLEMENTED YET
      */
-    public void stopListening(){
+    public void stopListening() {
+        //this.handle.wait(1000);
+        if(this.handle.connected == true){
+            this.handle.connected = false;
+            this.chatArea.setCaretPosition(chatArea.getDocument().getLength());
+            this.chatArea.append(">>> Disconnected!\n");
+        } // do nothing if the user has already disconnected.
     }
     
     
@@ -125,11 +133,12 @@ public class ChatGUI extends Thread implements ActionListener{
             this.usernameSet = true;
             this.chatArea.append(">>> Successfully set username to: " + msg + "\n");
             return;//leave this method so that it doesn't send the username as a packet to listeners
-        } else if(this.connected == true) { // if username has been set, append it to the message that will be sent
+        } else if(this.handle.connected == true) { // if username has been set, append it to the message that will be sent
             this.chatArea.setForeground(Color.WHITE);
                                     /*the username*/    /*the message*/
             this.handle.sendMessage(this.inputLabel.getText() + msg); //The main thread goes and runs the sendMessage method that MulticastHandler supports
         } else {
+            this.chatArea.setCaretPosition(chatArea.getDocument().getLength());
             this.chatArea.append(">>> Please connect before trying to send a message.\n");
         }
     }
@@ -144,8 +153,9 @@ public class ChatGUI extends Thread implements ActionListener{
         }
         else if(e.getSource() == disconButton){
             System.out.println("STOP LISTENING TO MULTICAST SOCKET");
+            this.stopListening();
         }
-        else if(e.getSource() == inputField) {
+        else if(e.getSource() == inputField) { //Goes here if user pressed 'Enter' in the inputField
             try {
                 this.sendMessage(inputField.getText());//SEND THIS TO THE MULTICAST SOCKET
                 inputField.setText(""); // EMPTY THE BOX BECAUSE MESSAGE HAS BEEN SENT
