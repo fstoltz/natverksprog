@@ -8,6 +8,7 @@ package BasicTCPServer;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -54,10 +55,16 @@ public class Server {
         Multi-threaded application!!!*/
         Socket clientSocket = listeningSocket.accept(); //Blocks, waiting for a SYN/SYN-ACK/ACK to take place
         
-        
+        //Sends data as strings
         this.out = new PrintWriter(clientSocket.getOutputStream(), true);
         
-        this.out.println("Enter person to look up details for: ");
+        //Sends data as serialized objects
+        ObjectOutputStream objOut;
+        objOut = new ObjectOutputStream(clientSocket.getOutputStream());
+        
+        
+        
+        //this.out.println("Enter person to look up details for: ");
         
         this.in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
         
@@ -65,9 +72,9 @@ public class Server {
         String phone = null;
         while((userString = this.in.readLine()) != null){
             System.out.println("MESSAGE FROM USER: " + userString);
-            this.out.println(this.dao.getFriendInfo(userString));
+            //this.out.println(this.dao.getFriendInfo(userString)); //Sends the phone number as a string
+            objOut.writeObject(this.dao.getFriendAsObj(userString));
         }
-        
     }
     
     

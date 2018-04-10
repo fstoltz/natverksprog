@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package BasicTCPServer;
+package BasicTCPClient;
 
 import java.io.Serializable;
 
@@ -18,6 +18,10 @@ public class Kompis implements Serializable {
     public Kompis(String name, String phone){
         this.name = name;
         this.phone = phone;
+    }
+    
+    public Kompis(){
+        
     }
 
     public String getName() {

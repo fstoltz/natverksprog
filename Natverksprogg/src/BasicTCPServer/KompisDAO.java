@@ -21,6 +21,19 @@ public class KompisDAO {
         list.add(newFriend);
     }
     
+    
+    public Kompis getFriendAsObj(String name){
+        Kompis k = null;
+        for (Kompis kompis : this.list){
+            if(name.equals(kompis.name)){
+                k = kompis;
+                break;
+            }
+        }
+        return k;
+    }
+    
+    
     public String getFriendInfo(String name){
         String result = null;
         for(Kompis kompis : this.list){

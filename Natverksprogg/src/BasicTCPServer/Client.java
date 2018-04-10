@@ -3,8 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package BasicTCPClient;
+package BasicTCPServer;
 
+import BasicTCPClient.*;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -39,9 +40,9 @@ public class Client {
         
         
         this.out.println(sc.nextLine());
-        Kompis k = new Kompis();
+        Kompis k;
         while((k = (Kompis) objIn.readObject()) != null){
-            System.out.println("MESSAGE FROM SERVER: " );
+            System.out.println("MESSAGE FROM SERVER: " + k.phone);
         }
 //        
 //        String serverStr;
