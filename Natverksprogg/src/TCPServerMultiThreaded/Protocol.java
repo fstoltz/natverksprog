@@ -5,14 +5,25 @@
  */
 package TCPServerMultiThreaded;
 
+
+import TCPServerWithProtocolSINGLETHREADED.KompisDAO;
+
 /**
  *
  * @author fstoltz
  */
 public class Protocol {
- 
+    static KompisDAO dao;
+    
+    public Protocol(KompisDAO dao){
+            this.dao = dao;
+    }
     
     public Object parseInput(String clientString){
-        return "I'm the server.. here's what I received: " + clientString;
+        if(clientString == null){ //server is sending initial message to client
+            return "Hey, give me a name!";
+        } else {
+            return Protocol.dao.getFriendInfo(clientString);
+        }
     }
 }

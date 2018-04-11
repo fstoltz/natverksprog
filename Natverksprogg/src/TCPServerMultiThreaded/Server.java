@@ -5,8 +5,10 @@
  */
 package TCPServerMultiThreaded;
 
+import TCPServerWithProtocolSINGLETHREADED.Kompis;
 import java.net.*;
 import java.io.*;
+import TCPServerWithProtocolSINGLETHREADED.KompisDAO;
 
 /**
  *
@@ -14,11 +16,16 @@ import java.io.*;
  */
 public class Server {
     static int port = 15000;
+    //Server owns a static KompisDAO object that all threads operate on, static because it's a shared object??
+    static KompisDAO dao = new KompisDAO();
+    
     
     public Server() throws IOException{
-        ServerSocket listeningSocket = new ServerSocket(port);   
+        Kompis k1 = new Kompis("Olof", "0707754607");Kompis k2 = new Kompis("Peter", "0213107");Kompis k3 = new Kompis("Kalle", "0107131");Kompis k4 = new Kompis("Erik", "001931");Kompis k5 = new Kompis("Pachi", "764183");dao.addFriend("Olof", "0707754607");dao.addFriend("Kalle", "74871471");dao.addFriend("Pachi", "3651743");dao.addFriend("Mera", "837189351");
+        
+        ServerSocket listeningSocket = new ServerSocket(port);
         while(true){
-            Thread newClientThread = new Thread(new ClientCaretaker(listeningSocket.accept()));
+            Thread newClientThread = new Thread(new ClientCaretaker(listeningSocket.accept(), this.dao));
             newClientThread.start();
             System.out.println("Number of threads: " + Thread.activeCount());
         }
@@ -27,7 +34,12 @@ public class Server {
     
     public static void main(String[] args) throws IOException{
         System.out.println("Listening on port:" + Server.port);
-        Server server = new Server();
+        try {
+            Server server = new Server();
+        } catch (Exception e) {
+            //swallow exception
+        }
+        
     }
     
 }

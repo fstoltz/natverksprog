@@ -7,6 +7,7 @@ package TCPServerMultiThreaded;
 
 import java.io.*;
 import java.net.*;
+import TCPServerWithProtocolSINGLETHREADED.KompisDAO;
 
 /**
  *
@@ -19,11 +20,11 @@ public class ClientCaretaker implements Runnable{
     Protocol protocol;
 
     
-    public ClientCaretaker(Socket clientSocket) throws IOException{
+    public ClientCaretaker(Socket clientSocket, KompisDAO dao) throws IOException{
         this.clientSocket = clientSocket;
         this.objOut = new ObjectOutputStream(clientSocket.getOutputStream()); //OUT-STREAM
         this.in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream())); //IN-STREAM
-        this.protocol = new Protocol(); // a separate protocol for each thread ofc
+        this.protocol = new Protocol(dao); // a separate protocol for each thread ofc, but the same KompisDAO object
     }
     
     @Override
@@ -35,8 +36,6 @@ public class ClientCaretaker implements Runnable{
             while((clientString = in.readLine()) != null){
                 objOut.writeObject(this.protocol.parseInput(clientString));
             }
-            
         } catch(Exception e){ e.printStackTrace(); }
-        
     }
 }
