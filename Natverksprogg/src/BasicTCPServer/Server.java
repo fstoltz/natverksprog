@@ -55,17 +55,19 @@ public class Server {
         Multi-threaded application!!!*/
         Socket clientSocket = listeningSocket.accept(); //Blocks, waiting for a SYN/SYN-ACK/ACK to take place
         
-        //Sends data as strings
-        this.out = new PrintWriter(clientSocket.getOutputStream(), true);
-        
         //Sends data as serialized objects
         ObjectOutputStream objOut;
         objOut = new ObjectOutputStream(clientSocket.getOutputStream());
         
+        //Send intro object
+        objOut.writeObject(new Intro("Welcome, I have accepted your connection."));
         
+        
+        //Creates an outputstream where I can print strings to the socket(client).
+        this.out = new PrintWriter(clientSocket.getOutputStream(), true);
         
         //this.out.println("Enter person to look up details for: ");
-        
+        //Creates an inputstream from the socket. (takes strings as input, not objects)
         this.in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
         
         String userString;
@@ -73,7 +75,18 @@ public class Server {
         while((userString = this.in.readLine()) != null){
             System.out.println("MESSAGE FROM USER: " + userString);
             //this.out.println(this.dao.getFriendInfo(userString)); //Sends the phone number as a string
-            objOut.writeObject(this.dao.getFriendAsObj(userString));
+            Response newResponse = new Response("foundfriend.useless string");
+            Kompis k = this.dao.getFriendAsObj(userString);
+            if(k != null){
+                //this means I found the friend object
+                newResponse.k = k;
+                newResponse.foundFriend = true;
+                objOut.writeObject(newResponse);
+            } else { //could not find the friend
+                newResponse.msg = ("Could not find friend.");
+                objOut.writeObject(newResponse);
+            }
+            //objOut.writeObject(this.dao.getFriendAsObj(userString));
         }
     }
     

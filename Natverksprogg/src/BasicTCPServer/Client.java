@@ -37,13 +37,53 @@ public class Client {
         //ObjectInputStream reader
         ObjectInputStream objIn;
         objIn = new ObjectInputStream(tcpSocket.getInputStream());
+        /*THOUGHTS:
+        Separation of concerns. Currently, the Client has access to the same libraries that the server
+        is using for creating and manipulating objects. The client does the job of
+        choosing what data to display etc.
         
         
-        this.out.println(sc.nextLine());
-        Kompis k;
-        while((k = (Kompis) objIn.readObject()) != null){
-            System.out.println("MESSAGE FROM SERVER: " + k.phone);
+        
+        
+        */
+        Object unknown;
+        while((unknown = objIn.readObject()) != null){
+            if(unknown instanceof Intro){ //if its the intro message that has been sent
+                System.out.println(((Intro) unknown).getMsg());
+            }
+            else if(unknown instanceof Kompis){ //this has now become useless because all responses from server are of type 'Response'
+                System.out.println(((Kompis) unknown).getPhone());
+            }
+            else if(unknown instanceof Response) {
+                if(((Response) unknown).foundFriend == true){
+                    System.out.println(((Response) unknown).k.phone); //extracts(prints) the phone value of the friend that was serialized and sent by the server
+                } else { //foundfriend is set to false and therefore we should not attempt to extract data from the k variable because it will
+                        //generate a nullpointerexception because the k was initailized to null serverside. Only if KompisDAO find the friend does it
+                        //associate k with the desired friend.
+                    System.out.println(((Response) unknown).msg);
+                }
+                
+            } else {
+                System.out.println("Something bad happened.");
+            }
+            this.out.println(sc.nextLine()); //Takes input from the user and sends it as a string to the socket(the server)
         }
+        
+        
+//        Object unknown = objIn.readObject();
+//        if(unknown instanceof Intro){
+//            //print intro data (string)
+//            System.out.println(((Intro) unknown).getMsg());
+//        }
+//        else if(unknown instanceof Kompis){
+//            //print kompis data
+//        }
+//        
+//        this.out.println(sc.nextLine());
+//        Kompis k;
+//        while((k = (Kompis) objIn.readObject()) != null){
+//            System.out.println("MESSAGE FROM SERVER: " + k.phone);
+//        }
 //        
 //        String serverStr;
 //        while((serverStr = this.in.readLine()) != null){
