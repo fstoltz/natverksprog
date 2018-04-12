@@ -6,6 +6,8 @@ import static java.awt.BorderLayout.*;
 import static java.awt.Color.WHITE;
 import java.awt.event.*;
 import java.io.IOException;
+import static java.lang.Thread.State.TERMINATED;
+import static java.lang.Thread.State.WAITING;
 import java.net.SocketException;
 import java.net.*;
 import javax.swing.*;
@@ -62,14 +64,16 @@ public class ChatGUI extends Thread implements ActionListener{
     /******************************/
     Client client = new Client(this.chatArea);
     
+    boolean USERNAME_IS_SET;
     
-    
+    String username;
     /******************************/
     /******************************/
     /******************************/
 
     ChatGUI() throws UnknownHostException, IOException {
         /*LAYOUT SETUP FOR PANELS*/
+        this.USERNAME_IS_SET = false;
         mainPanel.setLayout(new BorderLayout());
         buttonPanel.setLayout(new FlowLayout());
         inputPanel.setLayout(new FlowLayout());
@@ -96,6 +100,7 @@ public class ChatGUI extends Thread implements ActionListener{
         this.chatArea.setLineWrap(true);
         this.chatArea.setBackground(Color.BLACK);
         this.chatArea.setForeground(WHITE);
+        
             
 
         
@@ -139,15 +144,32 @@ public class ChatGUI extends Thread implements ActionListener{
             //System.out.println("START LISTENING ON MULTICAST SOCKET(new thread), "
             //        + "PRINTING MESSAGES ONTO THE TEXT AREA");
             //this.startListening(); //calls the start method for (this)-> i.e creates a new thread (run() execution starts)
-            this.client.startListeningOnServer();
+            if(connected == false){
+                this.client.startListeningOnServer();
+                this.connected = true;
+            }
+//            if((this.client.serverListenerThread.isAlive()) == false){
+//                //this.client.startListeningOnServer();
+//                //this.client.serverListenerThread.notify();
+//            }
+            
         }
         else if(e.getSource() == disconButton){
             System.out.println("STOP LISTENING TO MULTICAST SOCKET");
+            this.client.sendMessage("EXIT"); //If user presses Disconnect, sends an "EXIT" string to the server
             //this.stopListening();
         }
         else if(e.getSource() == inputField) { //Goes here if user pressed 'Enter' in the inputField
-            this.client.sendMessage(inputField.getText());
-            inputField.setText("");
+            if(this.USERNAME_IS_SET == false){
+                this.username = inputField.getText();
+                this.inputLabel.setText(this.username);
+                inputField.setText("");
+                this.USERNAME_IS_SET = true;
+            } else {
+                this.client.sendMessage(this.username + ": " + inputField.getText());
+                inputField.setText("");
+            }
+            
         }
     }
     

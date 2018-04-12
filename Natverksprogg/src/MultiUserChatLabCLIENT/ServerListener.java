@@ -43,8 +43,12 @@ public class ServerListener implements Runnable{
             Object unknown;
             while((unknown = objIn.readObject()) != null){
                 String serverMsg = (String) unknown;
-                System.out.println("Client: " + serverMsg);
+                //System.out.println("Client: " + serverMsg);
                 this.chatArea.append(serverMsg);
+                if(serverMsg.equalsIgnoreCase("EXIT")){
+                    //break;
+                    //wait(); //jump out of the while loop, terminating the thread
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();

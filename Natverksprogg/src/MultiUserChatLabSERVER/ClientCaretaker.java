@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package MultiUserChatLab;
+package MultiUserChatLabSERVER;
 
 import java.net.*;
 import java.util.*;
@@ -18,19 +18,26 @@ public class ClientCaretaker implements Runnable{
     Socket clientSocket;
     ObjectOutputStream objOut;
     BufferedReader in;
-    //Protocol protocol;
+    Protocol protocol;
     
     public ClientCaretaker(Socket clientSocket, Master m) throws IOException{
         this.m = m;
         this.clientSocket = clientSocket;
         this.in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+        
         this.objOut = new ObjectOutputStream(clientSocket.getOutputStream());
         
-        m.addOutputStream(this.objOut);
+        objOut.writeObject("Please enter your username: ");
+        objOut.flush();
+        //m.addOutputStream(this.objOut); //add this stream to the 'Master'
+        
+        this.protocol = new Protocol(this.objOut, m);
+        
     //lägg till outputstream i master
     }
 
-    
+    /*Maybe the protocol, when it has established a nickname for a user,
+    then the protocol adds an outputstream to the Master object*/
     
     @Override
     public void run() {
@@ -38,7 +45,9 @@ public class ClientCaretaker implements Runnable{
             String clientString = null;
             
             while((clientString = in.readLine()) != null){
-                this.m.sendToEveryone(clientString);
+                //this.m.sendToEveryone(clientString);
+                //send the string to the protocol
+                this.protocol.parseInput(clientString);
             }
             
         } catch (Exception e) {

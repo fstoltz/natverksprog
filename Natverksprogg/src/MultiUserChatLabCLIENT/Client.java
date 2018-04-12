@@ -29,6 +29,8 @@ public class Client {
         //lets first try only with letting user input
         
         this.serverSocket = new Socket(InetAddress.getLocalHost(), 15000);
+        
+        //System.out.println("port : "+this.serverSocket.getPort());
         this.out = new PrintWriter(serverSocket.getOutputStream(), true);
         
         this.serverListener = new ServerListener(this.serverSocket, chatArea);

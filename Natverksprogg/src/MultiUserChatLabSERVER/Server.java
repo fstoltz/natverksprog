@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package MultiUserChatLab;
+package MultiUserChatLabSERVER;
 
 import java.io.IOException;
 import java.net.*;
@@ -26,8 +26,8 @@ public class Server {
         
         while(true){
             Socket clientSocket = listeningSocket.accept();
-            
-            m.addSocket(clientSocket);
+            System.out.println("port "+clientSocket.getPort());
+            //m.addSocket(clientSocket);
             
             ClientCaretaker cC = new ClientCaretaker(clientSocket, this.m);
             
