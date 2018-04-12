@@ -25,7 +25,16 @@ public class Server {
         
         ServerSocket listeningSocket = new ServerSocket(port);
         while(true){
+            //add the master variable as a parameter to the ClientCaretakers constructor so we can send messages to it
             Thread newClientThread = new Thread(new ClientCaretaker(listeningSocket.accept(), this.dao));
+            //Eachtime the listeningSocket.accept() returns a socket, create a new ClientCaretaker,
+            //aswell as add this socket into the list of Sockets that the Master has as an instance-variable
+            //the master has List<Socket> that contains all sockets currently connected.
+            //If a client chooses to disconnect, go into this list and iterate through it,
+            //and remove the socket that has disconnected.
+            
+            //master.addSocket(clientSocket);
+            
             newClientThread.start();
             System.out.println("Number of threads: " + Thread.activeCount());
         }
