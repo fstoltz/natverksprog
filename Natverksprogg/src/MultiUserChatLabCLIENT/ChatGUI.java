@@ -15,25 +15,7 @@ import java.util.logging.Logger;
 import javax.swing.*;
 
 
-/*
-lol I realized now that I could've used the append method for adding text to the textarea,
-i ddidnt see the method until now.
 
-I just read the tips from Sigrun and I now understand how to do what I was trying to do.
-Have the separate class that i made multicasthandler handle the receving, and as a paramater to it's consturctor
-we could've passed the textarea object, and access it from there. This might've led to a scenario
-where the need for a synchronized method would arrise? or? . not sure.
-because you wouldn't want the sending socket to write to the textarea at the same time
-as the receiving socket does, then they would clash with eachother.
-
-----------
-update on sunday-
-I looked at Sigruns additional tips for implementation which made it clear up for me
-on how to implement the MulticastHandler class and pass around the TextArea object.
-I wasn't sure of how to do that initially, but now it's clear. And since we can use the
-append method, we dont need to keep track of that "textHistory" variable anymore which would've
-made it a bit more painful to make the socket handling in a separate class.
-*/
 
 public class ChatGUI extends Thread implements ActionListener{
     
@@ -123,21 +105,6 @@ public class ChatGUI extends Thread implements ActionListener{
         frame.setDefaultCloseOperation(3); //3 means exit
     }
     
-    public void sendMessage(String msg) throws SocketException, IOException{
-//        if(this.usernameSet == false){ //if it's first time user enters something in box, set the username
-//            this.inputLabel.setText(msg + ": ");
-//            this.usernameSet = true;
-//            this.chatArea.append(">>> Successfully set username to: " + msg + "\n");
-//            return;//leave this method so that it doesn't send the username as a packet to listeners
-//        } else if(this.handle.connected == true) { // if username has been set, append it to the message that will be sent
-//            this.chatArea.setForeground(Color.WHITE);
-//                                    /*the username*/    /*the message*/
-//            this.handle.sendMessage(this.inputLabel.getText() + msg); //The main thread goes and runs the sendMessage method that MulticastHandler supports
-//        } else {
-//            this.chatArea.setCaretPosition(chatArea.getDocument().getLength());
-//            this.chatArea.append(">>> Please connect before trying to send a message.\n");
-//        }
-    }
     
     @Override
     public void actionPerformed(ActionEvent e) {
@@ -159,11 +126,6 @@ public class ChatGUI extends Thread implements ActionListener{
                     Logger.getLogger(ChatGUI.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
-//            if((this.client.serverListenerThread.isAlive()) == false){
-//                //this.client.startListeningOnServer();
-//                //this.client.serverListenerThread.notify();
-//            }
-            
         }
         else if(e.getSource() == disconButton){
             System.out.println("STOP LISTENING TO MULTICAST SOCKET");
@@ -176,7 +138,7 @@ public class ChatGUI extends Thread implements ActionListener{
                 this.inputLabel.setText(this.username);
                 inputField.setText("");
                 this.USERNAME_IS_SET = true;
-            } else {
+            } else if (!inputField.getText().equals("")){
                 this.client.sendMessage(this.username + ": " + inputField.getText());
                 inputField.setText("");
             }
@@ -187,7 +149,7 @@ public class ChatGUI extends Thread implements ActionListener{
     public static void main(String[] args) throws IOException{
         ChatGUI gui = new ChatGUI();
         
-        gui.client.startClient();
+        //gui.client.startClient();
         
     }
     

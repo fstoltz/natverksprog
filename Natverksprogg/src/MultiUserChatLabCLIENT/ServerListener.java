@@ -10,10 +10,7 @@ import java.io.*;
 import java.net.*;
 import javax.swing.*;
 
-/**
- *
- * @author fstoltz
- */
+
 public class ServerListener implements Runnable{
     JTextArea chatArea;
     Socket serverSocket;
@@ -22,18 +19,7 @@ public class ServerListener implements Runnable{
         this.serverSocket = serverSocket;
         this.chatArea = chatArea;
     }
-    
-    
-//    public void startListeningOnServer() throws IOException, ClassNotFoundException{
-//        ObjectInputStream objIn = new ObjectInputStream(this.serverSocket.getInputStream());
-//        
-//        Object unknown;
-//        while((unknown = objIn.readObject()) != null){
-//            String serverMsg = (String) unknown;
-//            this.chatArea.append(serverMsg);
-//        }
-//        
-//    }
+
 
     @Override
     public void run() {
@@ -44,9 +30,11 @@ public class ServerListener implements Runnable{
             while((unknown = objIn.readObject()) != null){
                 String serverMsg = (String) unknown;
                 //System.out.println("Client: " + serverMsg);
+                this.chatArea.setCaretPosition(chatArea.getDocument().getLength());
                 this.chatArea.append(serverMsg);
                 if(serverMsg.equalsIgnoreCase("EXIT")){
-                    //break;
+                    //break; //if this one gets the exit string it means the server received it and will remove this client from the client pool
+                    //
                     //wait(); //jump out of the while loop, terminating the thread
                 }
             }

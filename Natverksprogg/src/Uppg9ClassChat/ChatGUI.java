@@ -9,25 +9,6 @@ import java.net.*;
 import javax.swing.*;
 
 
-/*
-lol I realized now that I could've used the append method for adding text to the textarea,
-i ddidnt see the method until now.
-
-I just read the tips from Sigrun and I now understand how to do what I was trying to do.
-Have the separate class that i made multicasthandler handle the receving, and as a paramater to it's consturctor
-we could've passed the textarea object, and access it from there. This might've led to a scenario
-where the need for a synchronized method would arrise? or? . not sure.
-because you wouldn't want the sending socket to write to the textarea at the same time
-as the receiving socket does, then they would clash with eachother.
-
-----------
-update on sunday-
-I looked at Sigruns additional tips for implementation which made it clear up for me
-on how to implement the MulticastHandler class and pass around the TextArea object.
-I wasn't sure of how to do that initially, but now it's clear. And since we can use the
-append method, we dont need to keep track of that "textHistory" variable anymore which would've
-made it a bit more painful to make the socket handling in a separate class.
-*/
 
 public class ChatGUI extends Thread implements ActionListener{
     /*This class will draw a chat GUI and hold necessary components for chat functionality*/
