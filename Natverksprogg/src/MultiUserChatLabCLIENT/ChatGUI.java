@@ -10,6 +10,8 @@ import static java.lang.Thread.State.TERMINATED;
 import static java.lang.Thread.State.WAITING;
 import java.net.SocketException;
 import java.net.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.*;
 
 
@@ -144,9 +146,18 @@ public class ChatGUI extends Thread implements ActionListener{
             //System.out.println("START LISTENING ON MULTICAST SOCKET(new thread), "
             //        + "PRINTING MESSAGES ONTO THE TEXT AREA");
             //this.startListening(); //calls the start method for (this)-> i.e creates a new thread (run() execution starts)
+            //I'M NOT ENTIRELY SURE WHAT THE CODE BELOW DOES AND WHY IT WORKS
             if(connected == false){
                 this.client.startListeningOnServer();
                 this.connected = true;
+            } else {
+                try {
+                    this.client = new Client(this.chatArea);//especially this
+                    this.client.startListeningOnServer();//especially this
+                    this.USERNAME_IS_SET = false;
+                } catch (IOException ex) {
+                    Logger.getLogger(ChatGUI.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
 //            if((this.client.serverListenerThread.isAlive()) == false){
 //                //this.client.startListeningOnServer();

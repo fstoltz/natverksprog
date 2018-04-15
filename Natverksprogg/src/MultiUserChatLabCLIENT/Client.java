@@ -21,6 +21,8 @@ public class Client {
 
     Thread serverListenerThread;
     
+    //public Client(){}
+    
     public Client(JTextArea chatArea) throws IOException{
         //Might need another thread client-side,
         //one thread that waits for user input,
