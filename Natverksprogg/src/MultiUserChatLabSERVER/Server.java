@@ -8,13 +8,11 @@ package MultiUserChatLabSERVER;
 import java.io.IOException;
 import java.net.*;
 
-/**
- *
- * @author fstoltz
- */
+
 public class Server {
     Master m;
     static int port = 15000;
+
     
     public Server(){
         m = new Master();
@@ -23,25 +21,18 @@ public class Server {
     
     public void startServer() throws IOException{
         ServerSocket listeningSocket = new ServerSocket(this.port);
-        
         while(true){
             Socket clientSocket = listeningSocket.accept();
             System.out.println("port "+clientSocket.getPort());
-            //m.addSocket(clientSocket);
-            
             ClientCaretaker cC = new ClientCaretaker(clientSocket, this.m);
-            
             Thread newClientThread = new Thread(cC);
             newClientThread.start();
         }
-        
     }
     
     
     public static void main(String[] args) throws IOException{
         Server server = new Server();
-        
         server.startServer();
     }
-    
 }

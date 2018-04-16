@@ -85,9 +85,6 @@ public class ChatGUI extends Thread implements ActionListener{
         this.chatArea.setBackground(Color.BLACK);
         this.chatArea.setForeground(WHITE);
         
-            
-
-        
         /*FRAME ADDS*/
         frame.add(mainPanel);
         frame.add(buttonPanel, NORTH);
@@ -142,16 +139,11 @@ public class ChatGUI extends Thread implements ActionListener{
                 this.client.sendMessage(this.username + ": " + inputField.getText());
                 inputField.setText("");
             }
-            
         }
     }
+
     
     public static void main(String[] args) throws IOException{
         ChatGUI gui = new ChatGUI();
-        
-        //gui.client.startClient();
-        
     }
-    
-    
 }

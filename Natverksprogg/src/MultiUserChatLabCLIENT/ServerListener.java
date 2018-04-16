@@ -15,6 +15,7 @@ public class ServerListener implements Runnable{
     JTextArea chatArea;
     Socket serverSocket;
     
+    
     public ServerListener(Socket serverSocket, JTextArea chatArea){
         this.serverSocket = serverSocket;
         this.chatArea = chatArea;
@@ -25,17 +26,13 @@ public class ServerListener implements Runnable{
     public void run() {
         try {
             ObjectInputStream objIn = new ObjectInputStream(this.serverSocket.getInputStream());
-        
             Object unknown;
             while((unknown = objIn.readObject()) != null){
                 String serverMsg = (String) unknown;
-                //System.out.println("Client: " + serverMsg);
                 this.chatArea.setCaretPosition(chatArea.getDocument().getLength());
                 this.chatArea.append(serverMsg);
                 if(serverMsg.equalsIgnoreCase("EXIT")){
-                    //break; //if this one gets the exit string it means the server received it and will remove this client from the client pool
-                    //
-                    //wait(); //jump out of the while loop, terminating the thread
+                    //this means the server got my(or others?) EXIT message
                 }
             }
         } catch (Exception e) {
