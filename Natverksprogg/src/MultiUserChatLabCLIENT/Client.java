@@ -20,7 +20,7 @@ public class Client {
     
     
     public Client(JTextArea chatArea) throws IOException{
-        this.serverSocket = new Socket(InetAddress.getByName("huerty.com"), 15000);
+        this.serverSocket = new Socket(InetAddress.getLocalHost(), 15000);
         this.out = new PrintWriter(serverSocket.getOutputStream(), true);
         this.serverListener = new ServerListener(this.serverSocket, chatArea); //the serverListener will receive the serverSocket and start an inputstream on it
         this.serverListenerThread = new Thread(this.serverListener);
